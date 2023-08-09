@@ -3,6 +3,7 @@ package b64_test
 import (
 	"testing"
 
+	"github.com/matmazurk/b64"
 	"github.com/stretchr/testify/require"
 )
 
