@@ -14,6 +14,11 @@ func TestEncode(t *testing.T) {
 		expected string
 	}{
 		{
+			name:     "for empty string should return empty string",
+			in:       "",
+			expected: "",
+		},
+		{
 			name:     "should correctly encode first example",
 			in:       "Many hands make light work.",
 			expected: "TWFueSBoYW5kcyBtYWtlIGxpZ2h0IHdvcmsu",
