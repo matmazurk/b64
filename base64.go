@@ -3,6 +3,9 @@ package b64
 const (
 	base64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
 	padding     = '='
+
+	base64Size = 6
+	byteSize   = 8
 )
 
 func Encode(in []byte) ([]byte, error) {
@@ -19,31 +22,31 @@ func Encode(in []byte) ([]byte, error) {
 
 	var rem remainder
 	for _, b := range in {
-		actb := uint16(b)
-		available := 8
+		currByte := uint16(b)
+		validBits := byteSize
 		if rem.validBits > 0 {
-			actb = uint16(rem.buf)<<8 | actb
-			available += rem.validBits
+			currByte = uint16(rem.buf)<<byteSize | currByte
+			validBits += rem.validBits
 		}
 
-		for available >= 6 {
-			cut := cut6SignificantBits(&actb, available)
-			available -= 6
+		for validBits >= base64Size {
+			cut := cut6SignificantBits(&currByte, validBits)
+			validBits -= base64Size
 			res = append(res, base64Chars[cut])
 		}
 
 		rem = remainder{
-			validBits: available,
-			buf:       byte(actb),
+			validBits: validBits,
+			buf:       byte(currByte),
 		}
 	}
 
 	if rem.validBits > 0 {
-		lastByteIndex := rem.buf << (6 - byte(rem.validBits))
+		lastByteIndex := rem.buf << (base64Size - byte(rem.validBits))
 		res = append(res, base64Chars[lastByteIndex])
 	}
 
-	for len(res)*6%8 != 0 {
+	for len(res)*base64Size%byteSize != 0 {
 		res = append(res, padding)
 	}
 
