@@ -3,10 +3,40 @@ package b64
 const (
 	base64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
 	padding     = '='
-
-	base64Size = 6
-	byteSize   = 8
 )
+
+const (
+	sixBits  = 6
+	byteSize = 8
+)
+
+type bits struct {
+	valid int
+	buf   uint16
+}
+
+func (b *bits) addLeft(other bits) {
+	b.buf = other.buf<<uint16(b.valid) | b.buf
+	b.valid += other.valid
+}
+
+func (b *bits) cut6SignificantBits() bits {
+	if b == nil {
+		return bits{}
+	}
+
+	remainingBits := b.valid - sixBits
+	mask := uint16(0b111111) << remainingBits
+	maskedBuf := b.buf & mask
+
+	b.valid = remainingBits
+	b.buf -= maskedBuf
+
+	return bits{
+		valid: sixBits,
+		buf:   maskedBuf >> uint16(remainingBits),
+	}
+}
 
 func Encode(in []byte) ([]byte, error) {
 	if len(in) == 0 {
@@ -15,54 +45,30 @@ func Encode(in []byte) ([]byte, error) {
 
 	res := make([]byte, 0, 2*len(in))
 
-	type remainder struct {
-		validBits int
-		buf       byte
-	}
-
-	var rem remainder
+	var remaining bits
 	for _, b := range in {
-		currByte := uint16(b)
-		validBits := byteSize
-		if rem.validBits > 0 {
-			currByte = uint16(rem.buf)<<byteSize | currByte
-			validBits += rem.validBits
+		current := bits{
+			valid: byteSize,
+			buf:   uint16(b),
+		}
+		current.addLeft(remaining)
+
+		for current.valid >= sixBits {
+			cut := current.cut6SignificantBits()
+			res = append(res, base64Chars[cut.buf])
 		}
 
-		for validBits >= base64Size {
-			cut := cut6SignificantBits(&currByte, validBits)
-			validBits -= base64Size
-			res = append(res, base64Chars[cut])
-		}
-
-		rem = remainder{
-			validBits: validBits,
-			buf:       byte(currByte),
-		}
+		remaining = current
 	}
 
-	if rem.validBits > 0 {
-		lastByteIndex := rem.buf << (base64Size - byte(rem.validBits))
+	if remaining.valid > 0 {
+		lastByteIndex := remaining.buf << (sixBits - byte(remaining.valid))
 		res = append(res, base64Chars[lastByteIndex])
 	}
 
-	for len(res)*base64Size%byteSize != 0 {
+	for len(res)*sixBits%byteSize != 0 {
 		res = append(res, padding)
 	}
 
 	return res, nil
-}
-
-func cut6SignificantBits(v *uint16, validBytes int) byte {
-	if v == nil {
-		return 0
-	}
-
-	remainingBits := uint16(validBytes - 6)
-	mask := uint16(0b111111) << remainingBits
-
-	ret := *v & mask
-	*v = *v - ret
-
-	return byte(ret >> remainingBits)
 }
