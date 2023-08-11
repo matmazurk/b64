@@ -8,29 +8,33 @@ import (
 )
 
 func TestEncode(t *testing.T) {
+	emptyBytes := []byte{}
 	tcs := []struct {
-		name     string
-		in       string
-		expected string
+		in       []byte
+		expected []byte
 	}{
 		{
-			name:     "for empty string should return empty string",
-			in:       "",
-			expected: "",
+			in:       emptyBytes,
+			expected: emptyBytes,
 		},
 		{
-			name:     "should correctly encode first example",
-			in:       "Many hands make light work.",
-			expected: "TWFueSBoYW5kcyBtYWtlIGxpZ2h0IHdvcmsu",
+			in:       []byte("Many hands make light work."),
+			expected: []byte("TWFueSBoYW5kcyBtYWtlIGxpZ2h0IHdvcmsu"),
+		},
+		{
+			in:       []byte("M"),
+			expected: []byte("TQ=="),
+		},
+		{
+			in:       []byte("Ma"),
+			expected: []byte("TWE="),
 		},
 	}
 
 	for _, tc := range tcs {
-		t.Run(tc.name, func(t *testing.T) {
-			res, err := b64.Encode(tc.in)
-			require.NoError(t, err)
+		res, err := b64.Encode(tc.in)
+		require.NoError(t, err)
 
-			require.Equal(t, tc.expected, res)
-		})
+		require.Equal(t, tc.expected, res)
 	}
 }
