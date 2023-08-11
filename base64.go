@@ -10,38 +10,37 @@ func Encode(in []byte) ([]byte, error) {
 		return []byte{}, nil
 	}
 
-	var res []byte
+	res := make([]byte, 0, 2*len(in))
 
-	var rem struct {
-		cnt int
-		rem byte
+	type remainder struct {
+		validBits int
+		buf       byte
 	}
+
+	var rem remainder
 	for _, b := range in {
 		actb := uint16(b)
 		available := 8
-		if rem.cnt > 0 {
-			actb = uint16(rem.rem)<<8 | actb
-			available += rem.cnt
+		if rem.validBits > 0 {
+			actb = uint16(rem.buf)<<8 | actb
+			available += rem.validBits
 		}
 
 		for available >= 6 {
-			cut := cut6LeftBits(&actb, available)
+			cut := cut6SignificantBits(&actb, available)
 			available -= 6
 			res = append(res, base64Chars[cut])
 		}
 
-		rem = struct {
-			cnt int
-			rem byte
-		}{
-			cnt: available,
-			rem: byte(actb),
+		rem = remainder{
+			validBits: available,
+			buf:       byte(actb),
 		}
 	}
 
-	if rem.cnt > 0 {
-		aa := rem.rem << (6 - byte(rem.cnt))
-		res = append(res, base64Chars[aa])
+	if rem.validBits > 0 {
+		lastByteIndex := rem.buf << (6 - byte(rem.validBits))
+		res = append(res, base64Chars[lastByteIndex])
 	}
 
 	for len(res)*6%8 != 0 {
@@ -51,16 +50,16 @@ func Encode(in []byte) ([]byte, error) {
 	return res, nil
 }
 
-func cut6LeftBits(f *uint16, validBytes int) byte {
-	if f == nil {
+func cut6SignificantBits(v *uint16, validBytes int) byte {
+	if v == nil {
 		return 0
 	}
 
 	remainingBits := uint16(validBytes - 6)
 	mask := uint16(0b111111) << remainingBits
 
-	ret := *f & mask
-	*f = *f - ret
+	ret := *v & mask
+	*v = *v - ret
 
 	return byte(ret >> remainingBits)
 }

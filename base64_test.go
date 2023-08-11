@@ -34,7 +34,6 @@ func TestEncode(t *testing.T) {
 	for _, tc := range tcs {
 		res, err := b64.Encode(tc.in)
 		require.NoError(t, err)
-
 		require.Equal(t, tc.expected, res)
 	}
 }
