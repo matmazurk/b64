@@ -11,13 +11,13 @@ const (
 )
 
 type bits struct {
-	valid int
-	buf   uint16
+	size int
+	buf  uint16
 }
 
 func (b *bits) addLeft(other bits) {
-	b.buf = other.buf<<uint16(b.valid) | b.buf
-	b.valid += other.valid
+	b.buf = other.buf<<uint16(b.size) | b.buf
+	b.size += other.size
 }
 
 func (b *bits) cut6SignificantBits() bits {
@@ -25,16 +25,16 @@ func (b *bits) cut6SignificantBits() bits {
 		return bits{}
 	}
 
-	remainingBits := b.valid - sixBits
+	remainingBits := b.size - sixBits
 	mask := uint16(0b111111) << remainingBits
 	maskedBuf := b.buf & mask
 
-	b.valid = remainingBits
+	b.size = remainingBits
 	b.buf -= maskedBuf
 
 	return bits{
-		valid: sixBits,
-		buf:   maskedBuf >> uint16(remainingBits),
+		size: sixBits,
+		buf:  maskedBuf >> uint16(remainingBits),
 	}
 }
 
@@ -48,12 +48,12 @@ func Encode(in []byte) ([]byte, error) {
 	var remaining bits
 	for _, b := range in {
 		current := bits{
-			valid: byteSize,
-			buf:   uint16(b),
+			size: byteSize,
+			buf:  uint16(b),
 		}
 		current.addLeft(remaining)
 
-		for current.valid >= sixBits {
+		for current.size >= sixBits {
 			cut := current.cut6SignificantBits()
 			res = append(res, base64Chars[cut.buf])
 		}
@@ -61,8 +61,8 @@ func Encode(in []byte) ([]byte, error) {
 		remaining = current
 	}
 
-	if remaining.valid > 0 {
-		lastByteIndex := remaining.buf << (sixBits - byte(remaining.valid))
+	if remaining.size > 0 {
+		lastByteIndex := remaining.buf << (sixBits - byte(remaining.size))
 		res = append(res, base64Chars[lastByteIndex])
 	}
 
