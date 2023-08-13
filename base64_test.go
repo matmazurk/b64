@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestEncode(t *testing.T) {
+func TestEncodeAndDecode(t *testing.T) {
 	emptyBytes := []byte{}
 	tcs := []struct {
 		in       []byte
@@ -35,5 +35,11 @@ func TestEncode(t *testing.T) {
 		res, err := b64.Encode(tc.in)
 		require.NoError(t, err)
 		require.Equal(t, tc.expected, res)
+	}
+
+	for _, tc := range tcs {
+		res, err := b64.Decode(tc.expected)
+		require.NoError(t, err)
+		require.Equal(t, res, tc.in)
 	}
 }
