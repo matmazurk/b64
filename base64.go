@@ -15,6 +15,13 @@ type bits struct {
 	buf  uint16
 }
 
+func newBits(size int, i uint16) bits {
+	return bits{
+		size: size,
+		buf:  i,
+	}
+}
+
 func (b *bits) addLeft(other bits) {
 	b.buf = other.buf<<uint16(b.size) | b.buf
 	b.size += other.size
@@ -32,10 +39,7 @@ func (b *bits) cut6SignificantBits() bits {
 	b.size = remainingBits
 	b.buf -= maskedBuf
 
-	return bits{
-		size: sixBits,
-		buf:  maskedBuf >> uint16(remainingBits),
-	}
+	return newBits(sixBits, maskedBuf>>uint16(remainingBits))
 }
 
 func Encode(in []byte) ([]byte, error) {
@@ -47,10 +51,7 @@ func Encode(in []byte) ([]byte, error) {
 
 	var remaining bits
 	for _, b := range in {
-		current := bits{
-			size: byteSize,
-			buf:  uint16(b),
-		}
+		current := newBits(byteSize, uint16(b))
 		current.addLeft(remaining)
 
 		for current.size >= sixBits {
