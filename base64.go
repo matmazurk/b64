@@ -63,11 +63,14 @@ func Decode(in []byte) ([]byte, error) {
 
 	ret := []byte{}
 	buf := newEmptyBits()
-	for _, b := range in {
+	appendRetIfBufBigEnough := func() {
 		if buf.size >= byteSize {
 			cut := buf.cutSignificantBits(byteSize)
 			ret = append(ret, byte(cut.buf))
 		}
+	}
+	for _, b := range in {
+		appendRetIfBufBigEnough()
 
 		if b == padding {
 			return ret, nil
@@ -81,10 +84,7 @@ func Decode(in []byte) ([]byte, error) {
 		buf.addRight(newBits(sixBits, uint16(c)))
 	}
 
-	if buf.size >= byteSize {
-		cut := buf.cutSignificantBits(byteSize)
-		ret = append(ret, byte(cut.buf))
-	}
+	appendRetIfBufBigEnough()
 
 	return ret, nil
 }
