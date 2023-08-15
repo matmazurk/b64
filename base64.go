@@ -45,8 +45,8 @@ func Encode(in []byte) []byte {
 	}
 
 	if remaining.size > 0 {
-		lastByteIndex := remaining.buf << (sixBits - byte(remaining.size))
-		res = append(res, base64Chars[lastByteIndex])
+		remaining.addRight(newBits(sixBits-remaining.size, 0))
+		res = append(res, base64Chars[remaining.buf])
 	}
 
 	for len(res)*sixBits%byteSize != 0 {
