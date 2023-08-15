@@ -52,10 +52,6 @@ func (b *bits) cutSignificantBits(n int) *bits {
 	return newBits(n, maskedBuf>>uint16(remainingBits))
 }
 
-func (b *bits) cut6SignificantBits() *bits {
-	return b.cutSignificantBits(sixBits)
-}
-
 func (b *bits) String() string {
 	return fmt.Sprintf("{size:%d, buf:0b%b}", b.size, b.buf)
 }

@@ -28,7 +28,7 @@ func Encode(in []byte) []byte {
 		current.addLeft(remaining)
 
 		for current.size >= sixBits {
-			cut := current.cut6SignificantBits()
+			cut := current.cutSignificantBits(sixBits)
 			res = append(res, base64Chars[cut.buf])
 		}
 
