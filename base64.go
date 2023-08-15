@@ -9,20 +9,12 @@ const (
 	padding     = '='
 )
 
-var b64Map = m()
-
-func m() map[byte]int {
-	mm := make(map[byte]int, len(base64Chars))
-	for i, c := range base64Chars {
-		mm[byte(c)] = i
-	}
-	return mm
-}
-
 const (
 	sixBits  = 6
 	byteSize = 8
 )
+
+var b64Map = getB64Map()
 
 func Encode(in []byte) []byte {
 	if len(in) == 0 {
@@ -86,4 +78,12 @@ func Decode(in []byte) ([]byte, error) {
 	appendRetIfBufBigEnough()
 
 	return ret, nil
+}
+
+func getB64Map() map[byte]int {
+	mm := make(map[byte]int, len(base64Chars))
+	for i, c := range base64Chars {
+		mm[byte(c)] = i
+	}
+	return mm
 }
