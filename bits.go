@@ -1,30 +1,40 @@
 package b64
 
+import "fmt"
+
 type bits struct {
 	size int
 	buf  uint16
 }
 
-func newBits(size int, i uint16) bits {
-	return bits{
+func newBits(size int, i uint16) *bits {
+	return &bits{
 		size: size,
 		buf:  i,
 	}
 }
 
-func (b *bits) addLeft(other bits) {
+func (b *bits) equals(other *bits) bool {
+	if b == nil || other == nil {
+		return b == nil && other == nil
+	}
+
+	return *b == *other
+}
+
+func (b *bits) addLeft(other *bits) {
 	b.buf = other.buf<<uint16(b.size) | b.buf
 	b.size += other.size
 }
 
-func (b *bits) addRight(other bits) {
+func (b *bits) addRight(other *bits) {
 	b.buf = b.buf<<uint16(other.size) | other.buf
 	b.size += other.size
 }
 
-func (b *bits) cutSignificantBits(n int) bits {
+func (b *bits) cutSignificantBits(n int) *bits {
 	if b == nil {
-		return bits{}
+		return &bits{}
 	}
 
 	remainingBits := b.size - n
@@ -38,8 +48,12 @@ func (b *bits) cutSignificantBits(n int) bits {
 	return newBits(n, maskedBuf>>uint16(remainingBits))
 }
 
-func (b *bits) cut6SignificantBits() bits {
+func (b *bits) cut6SignificantBits() *bits {
 	return b.cutSignificantBits(sixBits)
+}
+
+func (b *bits) String() string {
+	return fmt.Sprintf("{size:%d, buf:0b%b}", b.size, b.buf)
 }
 
 func pow(x, y int) int {

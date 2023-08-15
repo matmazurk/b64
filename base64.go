@@ -31,7 +31,7 @@ func Encode(in []byte) ([]byte, error) {
 
 	res := make([]byte, 0, 2*len(in))
 
-	var remaining bits
+	remaining := newBits(0, 0)
 	for _, b := range in {
 		current := newBits(byteSize, uint16(b))
 		current.addLeft(remaining)
@@ -62,7 +62,7 @@ func Decode(in []byte) ([]byte, error) {
 	}
 
 	ret := []byte{}
-	var buf bits
+	buf := newBits(0, 0)
 	for _, b := range in {
 		if buf.size >= 8 {
 			cut := buf.cutSignificantBits(8)
