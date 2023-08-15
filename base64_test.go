@@ -53,8 +53,13 @@ func TestEncodeAndDecode(t *testing.T) {
 				require.Equal(t, tc.in, res)
 			},
 		)
-
 	}
+
+	t.Run("Decode should fail for input with invalid base64 character", func(t *testing.T) {
+		const input = "∂"
+		_, err := b64.Decode([]byte(input))
+		require.ErrorContains(t, err, "invalid base64 character")
+	})
 }
 
 func FuzzEncodeAndDecode(f *testing.F) {

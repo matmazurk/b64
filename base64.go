@@ -30,7 +30,6 @@ func Encode(in []byte) []byte {
 	}
 
 	res := make([]byte, 0, 2*len(in))
-
 	remaining := newEmptyBits()
 	for _, b := range in {
 		current := newBits(byteSize, uint16(b))
@@ -78,7 +77,7 @@ func Decode(in []byte) ([]byte, error) {
 
 		c, ok := b64Map[b]
 		if !ok {
-			return nil, fmt.Errorf("")
+			return nil, fmt.Errorf("invalid base64 character '%c'", b)
 		}
 
 		buf.addRight(newBits(sixBits, uint16(c)))
