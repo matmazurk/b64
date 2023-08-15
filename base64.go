@@ -1,9 +1,23 @@
 package b64
 
+import (
+	"fmt"
+)
+
 const (
 	base64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
 	padding     = '='
 )
+
+var b64Map = m()
+
+func m() map[byte]int {
+	mm := make(map[byte]int, len(base64Chars))
+	for i, c := range base64Chars {
+		mm[byte(c)] = i
+	}
+	return mm
+}
 
 const (
 	sixBits  = 6
@@ -40,4 +54,36 @@ func Encode(in []byte) ([]byte, error) {
 	}
 
 	return res, nil
+}
+
+func Decode(in []byte) ([]byte, error) {
+	if len(in) == 0 {
+		return []byte{}, nil
+	}
+
+	ret := []byte{}
+	var buf bits
+	for _, b := range in {
+		if buf.size >= 8 {
+			cut := buf.cutSignificantBits(8)
+			ret = append(ret, byte(cut.buf))
+		}
+
+		if b == padding {
+			return ret, nil
+		}
+		c, ok := b64Map[b]
+		if !ok {
+			return nil, fmt.Errorf("")
+		}
+
+		buf.addRight(newBits(sixBits, uint16(c)))
+	}
+
+	if buf.size >= 8 {
+		cut := buf.cutSignificantBits(8)
+		ret = append(ret, byte(cut.buf))
+	}
+
+	return ret, nil
 }
