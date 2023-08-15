@@ -24,9 +24,9 @@ const (
 	byteSize = 8
 )
 
-func Encode(in []byte) ([]byte, error) {
+func Encode(in []byte) []byte {
 	if len(in) == 0 {
-		return []byte{}, nil
+		return []byte{}
 	}
 
 	res := make([]byte, 0, 2*len(in))
@@ -53,7 +53,7 @@ func Encode(in []byte) ([]byte, error) {
 		res = append(res, padding)
 	}
 
-	return res, nil
+	return res
 }
 
 func Decode(in []byte) ([]byte, error) {

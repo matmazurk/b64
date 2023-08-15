@@ -38,8 +38,7 @@ func TestEncodeAndDecode(t *testing.T) {
 		t.Run(
 			fmt.Sprintf("%s encoding should result in %s", string(tc.in), string(tc.out)),
 			func(t *testing.T) {
-				res, err := b64.Encode(tc.in)
-				require.NoError(t, err)
+				res := b64.Encode(tc.in)
 				require.Equal(t, tc.out, res)
 			},
 		)
@@ -60,9 +59,7 @@ func TestEncodeAndDecode(t *testing.T) {
 
 func FuzzEncodeAndDecode(f *testing.F) {
 	f.Fuzz(func(t *testing.T, bt []byte) {
-		enc, err := b64.Encode(bt)
-		require.NoError(t, err)
-
+		enc := b64.Encode(bt)
 		dec, err := b64.Decode(enc)
 		require.NoError(t, err)
 		if !bytes.Equal(bt, dec) {
