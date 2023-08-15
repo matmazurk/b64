@@ -7,6 +7,10 @@ type bits struct {
 	buf  uint16
 }
 
+func newEmptyBits() *bits {
+	return &bits{}
+}
+
 func newBits(size int, i uint16) *bits {
 	return &bits{
 		size: size,

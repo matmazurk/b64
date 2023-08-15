@@ -12,17 +12,17 @@ func Test_bits_addLeft(t *testing.T) {
 		expected *bits
 	}{
 		{
-			input:    newBits(0, 0),
-			toAdd:    newBits(0, 0),
-			expected: newBits(0, 0),
+			input:    newEmptyBits(),
+			toAdd:    newEmptyBits(),
+			expected: newEmptyBits(),
 		},
 		{
 			input:    newBits(5, 0b10000),
-			toAdd:    newBits(0, 0),
+			toAdd:    newEmptyBits(),
 			expected: newBits(5, 0b10000),
 		},
 		{
-			input:    newBits(0, 0),
+			input:    newEmptyBits(),
 			toAdd:    newBits(5, 0b10000),
 			expected: newBits(5, 0b10000),
 		},
@@ -54,17 +54,17 @@ func Test_bits_addRight(t *testing.T) {
 		expected *bits
 	}{
 		{
-			input:    newBits(0, 0),
-			toAdd:    newBits(0, 0),
-			expected: newBits(0, 0),
+			input:    newEmptyBits(),
+			toAdd:    newEmptyBits(),
+			expected: newEmptyBits(),
 		},
 		{
 			input:    newBits(5, 0b10000),
-			toAdd:    newBits(0, 0),
+			toAdd:    newEmptyBits(),
 			expected: newBits(5, 0b10000),
 		},
 		{
-			input:    newBits(0, 0),
+			input:    newEmptyBits(),
 			toAdd:    newBits(5, 0b10000),
 			expected: newBits(5, 0b10000),
 		},
@@ -97,10 +97,10 @@ func Test_bits_cutSignificantBits(t *testing.T) {
 		expectedIn  *bits
 	}{
 		{
-			in:          newBits(0, 0),
+			in:          newEmptyBits(),
 			toCut:       0,
-			expectedCut: newBits(0, 0),
-			expectedIn:  newBits(0, 0),
+			expectedCut: newEmptyBits(),
+			expectedIn:  newEmptyBits(),
 		},
 		{
 			in:          newBits(6, 0b110011),
