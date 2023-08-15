@@ -17,17 +17,36 @@ func (b *bits) addLeft(other bits) {
 	b.size += other.size
 }
 
-func (b *bits) cut6SignificantBits() bits {
+func (b *bits) addRight(other bits) {
+	b.buf = b.buf<<uint16(other.size) | other.buf
+	b.size += other.size
+}
+
+func (b *bits) cutSignificantBits(n int) bits {
 	if b == nil {
 		return bits{}
 	}
 
-	remainingBits := b.size - sixBits
-	mask := uint16(0b111111) << remainingBits
+	remainingBits := b.size - n
+	ones := uint16(pow(2, n+1) - 1)
+	mask := ones << remainingBits
 	maskedBuf := b.buf & mask
 
 	b.size = remainingBits
 	b.buf -= maskedBuf
 
-	return newBits(sixBits, maskedBuf>>uint16(remainingBits))
+	return newBits(n, maskedBuf>>uint16(remainingBits))
+}
+
+func (b *bits) cut6SignificantBits() bits {
+	return b.cutSignificantBits(sixBits)
+}
+
+func pow(x, y int) int {
+	res := 1
+	for i := 0; i < y-1; i++ {
+		res *= x
+	}
+
+	return res
 }
