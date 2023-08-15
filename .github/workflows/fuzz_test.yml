@@ -1,12 +1,9 @@
-name: unit_tests
+name: fuzz_test
 
-on:
-  push:
-    branches: [ "master" ]
+on: [workflow_dispatch]
 
 jobs:
-
-  test:
+  fuzz_test:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -14,7 +11,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
-        go-version: '1.20'
+        go-version: '1.21'
 
     - name: Test
-      run: go test -v ./...
+      run: go test -fuzz ./...
