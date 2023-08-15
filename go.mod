@@ -1,4 +1,4 @@
-module github.com/matmazurk/b64
+module github.com/matmazurk/base64
 
 go 1.21
 

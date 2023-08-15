@@ -1,4 +1,4 @@
-package b64
+package base64
 
 import (
 	"fmt"

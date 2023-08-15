@@ -1,4 +1,4 @@
-package b64_test
+package base64_test
 
 import (
 	"bytes"
@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/matmazurk/b64"
+	"github.com/matmazurk/base64"
 	"github.com/stretchr/testify/require"
 )
 
@@ -38,7 +38,7 @@ func TestEncodeAndDecode(t *testing.T) {
 		t.Run(
 			fmt.Sprintf("%s encoding should result in %s", string(tc.in), string(tc.out)),
 			func(t *testing.T) {
-				res := b64.Encode(tc.in)
+				res := base64.Encode(tc.in)
 				require.Equal(t, tc.out, res)
 			},
 		)
@@ -48,7 +48,7 @@ func TestEncodeAndDecode(t *testing.T) {
 		t.Run(
 			fmt.Sprintf("%s decoding should result in %s", string(tc.out), string(tc.in)),
 			func(t *testing.T) {
-				res, err := b64.Decode(tc.out)
+				res, err := base64.Decode(tc.out)
 				require.NoError(t, err)
 				require.Equal(t, tc.in, res)
 			},
@@ -57,15 +57,15 @@ func TestEncodeAndDecode(t *testing.T) {
 
 	t.Run("Decode should fail for input with invalid base64 character", func(t *testing.T) {
 		const input = "∂"
-		_, err := b64.Decode([]byte(input))
+		_, err := base64.Decode([]byte(input))
 		require.ErrorContains(t, err, "invalid base64 character")
 	})
 }
 
 func FuzzEncodeAndDecode(f *testing.F) {
 	f.Fuzz(func(t *testing.T, bt []byte) {
-		enc := b64.Encode(bt)
-		dec, err := b64.Decode(enc)
+		enc := base64.Encode(bt)
+		dec, err := base64.Decode(enc)
 		require.NoError(t, err)
 		if !bytes.Equal(bt, dec) {
 			t.Errorf("decoded different than original input: %s", cmp.Diff(bt, dec))
